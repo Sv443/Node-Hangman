@@ -1,0 +1,36 @@
+{
+  "name": "node-hangman",
+  "version": "0.1.0",
+  "description": "A simple game of hangman you can play directly in the CLI",
+  "main": "Hangman.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sv443/Node-Hangman.git"
+  },
+  "keywords": [
+    "game",
+    "cli",
+    "command-line",
+    "hangman",
+    "node",
+    "javascript",
+    "js",
+    "node-js"
+  ],
+  "author": {
+    "name": "Sv443",
+    "email": "sven.fehler@web.de",
+    "url": "https://sv443.net/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Sv443/Node-Hangman/issues"
+  },
+  "homepage": "https://github.com/Sv443/Node-Hangman#readme",
+  "dependencies": {
+    "svjsl": "^1.8.3"
+  }
+}
