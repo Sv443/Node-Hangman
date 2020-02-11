@@ -1,3 +1,5 @@
+const fs = require("fs");
+const crypto = require("crypto");
 const jsl = require("svjsl");
 const package = require("./package.json");
 const graphics = require("./data/graphics.json");
@@ -16,6 +18,12 @@ const debuggerActive = (typeof v8debug === "object" || /--debug|--inspect/.test(
  */
 
 /**
+ * @typedef {Object} RandomWord
+ * @prop {Array<String>} split Every character of the randomly selected item in an array
+ * @prop {String} word The whole word
+ */
+
+/**
  * Starts Node-Hangman
  * @param {Array<MenuPromptResult>} res
  */
@@ -31,20 +39,29 @@ function init(res)
         process.stdin.setRawMode(true);
 
     if(!res || res[0] == undefined || res[0].key == "x")
+    {
+        sayGoodbye();
         return process.exit(0);
+    }
 
     let difficultyMap = [
         "unused",
         "easy",
         "normal",
         "hard",
-        "about"
+        "about",
+        "highscores"
     ];
 
     let difficulty = difficultyMap[parseInt(res[0].key)];
 
     if(difficulty == "about")
         return aboutGame();
+    
+    if(difficulty == "highscores")
+        return showHighscores();
+    
+    global._gameDifficulty = difficulty;
 
     let availableWords = words[difficulty];
     let randomWord = getRandomWord(availableWords);
@@ -59,7 +76,7 @@ function init(res)
  * @param {RandomWord} wordToGuess 
  * @param {Array<String>} guessedChars 
  * @param {String} [message]
- * @param {Boolean} [gameWon]
+ * @param {Boolean} [winGame]
  */
 function renderStage(index, wordToGuess, guessedChars, message, winGame)
 {
@@ -67,13 +84,13 @@ function renderStage(index, wordToGuess, guessedChars, message, winGame)
 
     process.stdout.write(`${graphics.ceiling}\n`);
     Object.keys(graphics.stages[index]).forEach(key => {
-        let line = `${graphics.stageLinePrefix}${graphics.stages[index][key]}${graphics.stageLineSuffix}\n`;
+        let line = `${graphics.stageLinePrefix}${jsl.colors.fg.yellow}${graphics.stages[index][key]}${jsl.colors.rst}${graphics.stageLineSuffix}\n`;
         process.stdout.write(line);
     });
     process.stdout.write(`${graphics.floor}\n\n`);
 
     process.stdout.write(`Word: ${censoredWord(wordToGuess, guessedChars)}\n`);
-    process.stdout.write(`Used letters: ${guessedChars.length > 0 ? guessedChars.join(" ") : "(none)"}\n`);
+    process.stdout.write(`Used letters: ${guessedChars.length > 0 ? guessedChars.sort().join(" ") : "(none)"}\n`);
 
     if(!graphics.stages[index + 1])
         return gameOver(`The word was "${wordToGuess.word}"`);
@@ -83,19 +100,23 @@ function renderStage(index, wordToGuess, guessedChars, message, winGame)
     else process.stdout.write("\n\n");
 
     if(winGame === true)
-        return gameWon();
+    {
+        let score = (global._guessTries - removeDuplicates(wordToGuess.split).length);
+        saveScore(global._gameDifficulty, score);
+        return gameWon(score);
+    }
 
     process.stdout.write("\n─► ");
     process.stdin.resume();
 
-    let keypressEvent = (chunk, key) => {
+    let keypressEvent = (chunk, key) => { //eslint-disable-line no-unused-vars
         if(global._listenerAttached)
         {
             process.stdin.pause();
             removeKeypressEvent();
 
-            if(key.name == "escape")
-                return startMenu();
+            // if(key.name == "escape")
+            //     return startMenu();
 
             if(chunk && chunk.match(/\u0003/gmu)) //eslint-disable-line no-control-regex
                 return process.exit(0);
@@ -163,11 +184,52 @@ function censoredWord(wordToGuess, guessedChars)
 }
 
 /**
+ * Waits for the user to press a key and then calls the function passed in `callFunction`
+ * @param {Function} callFunction
+ */
+function pauseThenCall(callFunction)
+{
+    process.stdout.write("Press any key to continue... ");
+    process.stdin.resume();
+
+    let keypressEvent = chunk => {
+        if(global._ptcListenerAttached)
+        {
+            process.stdin.pause();
+            removeKeypressEvent();
+
+            if(chunk && chunk.match(/\u0003/gmu)) //eslint-disable-line no-control-regex
+                return process.exit(0);
+
+            return callFunction();
+        }
+    };
+
+    let removeKeypressEvent = () => {
+        process.stdin.removeListener("keypress", keypressEvent);
+        global._ptcListenerAttached = false;
+    };
+
+    process.stdin.on("keypress", keypressEvent);
+    global._ptcListenerAttached = true;
+}
+
+/**
  * Removes duplicate items in an array
  * @param {Array<*>} array 
  */
 function removeDuplicates(array) {
     return array.filter((a, b) => array.indexOf(a) === b);
+}
+
+/**
+ * Capitalizes the first letter of a string
+ * @param {String} str
+ * @returns {String}
+ */
+function capitalize(str)
+{
+    return str.substr(0, 1).toUpperCase() + str.substr(1, str.length - 1);
 }
 
 /**
@@ -179,19 +241,22 @@ function gameOver(message)
     console.log(`\n${jsl.colors.fg.red}Game over!${jsl.colors.rst}\n`);
     if(message)
         console.log(`${message}\n`);
-    process.exit(0);
+    
+    return pauseThenCall(() => startMenu());
 }
 
 /**
  * Shows the game won screen
+ * @param {Number} score
  * @param {String} [message]
  */
-function gameWon(message)
+function gameWon(score, message)
 {
-    console.log(`\n${jsl.colors.fg.green}You won the game after ${global._guessTries} guessed letters!${jsl.colors.rst}\n`);
+    console.log(`\n${jsl.colors.fg.green}You won the game!${jsl.colors.rst}\n\nDifficulty: ${jsl.colors.fg.yellow}${capitalize(global._gameDifficulty)}${jsl.colors.rst}\nYour score is ${score <= 5 ? jsl.colors.fg.green : (score <= 10 ? jsl.colors.fg.yellow : jsl.colors.fg.red)}${score}${jsl.colors.rst}\n`);
     if(message)
         console.log(`${message}\n`);
-    process.exit(0);
+    
+    return pauseThenCall(() => startMenu());
 }
 
 /**
@@ -199,18 +264,89 @@ function gameWon(message)
  */
 function aboutGame()
 {
-    console.log(`About Node-Hangman:\n`);
+    console.log(`${jsl.colors.fg.blue}About Node-Hangman:${jsl.colors.rst}\n`);
+    console.log(`Made by ${jsl.colors.fg.yellow}${package.author.name}${jsl.colors.rst} ( ${package.author.url} )`);
+    console.log(`Licensed under the ${jsl.colors.fg.yellow}MIT License${jsl.colors.rst} ( https://sv443.net/LICENSE )`);
 
-    setTimeout(() => {
-        return startMenu();
-    }, 10 * 1000);
+    process.stdout.write("\n\n");
+
+    return pauseThenCall(() => startMenu());
 }
 
 /**
- * @typedef {Object} RandomWord
- * @prop {Array<String>} split Every character of the randomly selected item in an array
- * @prop {String} word The whole word
+ * Shows all highscores
  */
+function showHighscores()
+{
+    let highscoreObj = {};
+
+    if(fs.existsSync("./.scores"))
+        highscoreObj = JSON.parse(decrypt(fs.readFileSync("./.scores").toString()));
+
+    console.log(`Highscores:\n`);
+    console.log(JSON.stringify(highscoreObj, null, 4));
+    return pauseThenCall(() => startMenu());
+}
+
+/**
+ * Saves a score to the scoreboard
+ * @param {String} difficulty 
+ * @param {Number} score 
+ */
+function saveScore(difficulty, score)
+{
+    let currentScores = {
+        "easy": [],
+        "normal": [],
+        "hard": []
+    };
+    
+    if(fs.existsSync("./.scores"))
+        currentScores = JSON.parse(decrypt(fs.readFileSync("./.scores").toString()));
+    
+    currentScores[difficulty].push({
+        timestamp: new Date().getTime(),
+        score: score
+    });
+
+    fs.writeFileSync("./.scores", encrypt(JSON.stringify(currentScores, null, 4)));
+}
+
+/**
+ * Encrypts things like the score object so users can't easily tamper with them. Obviously this isn't very safe but if you know what you're doing I won't be able to stop you anyways
+ * @param {String} value 
+ * @returns {Buffer}
+ */
+function encrypt(value)
+{
+    let iv = crypto.randomBytes(16);
+    let cipher = crypto.createCipheriv("aes-256-cbc", "aa5de862e31081dcb5605ffdfad9d82a", iv);
+    let encrypted = cipher.update(value.toString());
+    return `${iv.toString("hex")}:${Buffer.concat([encrypted, cipher.final()]).toString("hex")}`;
+}
+
+/**
+ * Decrypts previously encrypted things like the score object
+ * @param {String} value 
+ * @returns {String}
+ */
+function decrypt(value)
+{
+    let textParts = value.split(":");
+    let iv = Buffer.from(textParts.shift(), "hex");
+    let encryptedText = Buffer.from(textParts.join(":"), "hex");
+    let decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from("aa5de862e31081dcb5605ffdfad9d82a"), iv);
+    let decrypted = decipher.update(encryptedText);
+
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+
+    return decrypted.toString();
+}
+
+function sayGoodbye()
+{
+    console.log(`${jsl.colors.fg.yellow}Goodbye.${jsl.colors.rst}`);
+}
 
 /**
  * @returns {RandomWord}
@@ -233,6 +369,9 @@ function clearConsole()
     console.clear();
 }
 
+/**
+ * Opens the start menu / main menu
+ */
 function startMenu()
 {
     clearConsole();
@@ -257,11 +396,15 @@ function startMenu()
             },
             {
                 key: "3",
-                description: "Hard"
+                description: "Hard\n"
             },
             {
                 key: "4",
                 description: "About"
+            },
+            {
+                key: "5",
+                description: "Highscores"
             }
         ]
     });

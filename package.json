@@ -4,9 +4,11 @@
   "description": "A simple game of hangman you can play directly in the CLI",
   "main": "Hangman.js",
   "scripts": {
+    "start": "node Hangman.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-win": "pkg -t node12-win --out-path build/ Hangman.js",
-    "build-linux": "pkg -t node12-linux --out-path build/ Hangman.js"
+    "build-win": "pkg -t node12-win -o build/Node-Hangman_win.exe Hangman.js && node tools/postbuild.js",
+    "build-linux": "pkg -t node12-linux -o build/Node-Hangman_linux Hangman.js && node tools/postbuild.js",
+    "build": "npm run build-win && npm run build-linux && node tools/postbuild.js"
   },
   "repository": {
     "type": "git",
@@ -25,7 +27,7 @@
   "author": {
     "name": "Sv443",
     "email": "sven.fehler@web.de",
-    "url": "https://sv443.net/"
+    "url": "https://github.com/Sv443"
   },
   "license": "MIT",
   "bugs": {
