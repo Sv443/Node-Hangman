@@ -275,6 +275,7 @@ function coloredScore(score)
 function aboutGame()
 {
     console.log(`${jsl.colors.fg.blue}About Node-Hangman:${jsl.colors.rst}\n`);
+    console.log(`Version: ${jsl.colors.fg.yellow}${package.version}${jsl.colors.rst}`);
     console.log(`Made by ${jsl.colors.fg.yellow}${package.author.name}${jsl.colors.rst} ( ${package.author.url} )`);
     console.log(`Licensed under the ${jsl.colors.fg.yellow}MIT License${jsl.colors.rst} ( https://sv443.net/LICENSE )`);
 
@@ -303,7 +304,7 @@ function showHighscores()
             {
                 console.log(`\n${jsl.colors.fg.yellow}${capitalize(key)}:${jsl.colors.rst}`);
                 highscoreObj[key].forEach(sc => {
-                    console.log(`    - [${new Date(sc.timestamp).toLocaleString()}] - Score: ${coloredScore(sc.score)} - Word: "${sc.word}"`);
+                    console.log(`    Score: ${sc.score < 10 ? " " : ""}${coloredScore(sc.score)} - Word: "${sc.word}" - Date: ${new Date(sc.timestamp).toLocaleString()}`);
                 });
             }
         });
