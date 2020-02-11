@@ -4,7 +4,9 @@
   "description": "A simple game of hangman you can play directly in the CLI",
   "main": "Hangman.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-win": "pkg -t node12-win --out-path build/ Hangman.js",
+    "build-linux": "pkg -t node12-linux --out-path build/ Hangman.js"
   },
   "repository": {
     "type": "git",
@@ -32,5 +34,8 @@
   "homepage": "https://github.com/Sv443/Node-Hangman#readme",
   "dependencies": {
     "svjsl": "^1.8.3"
+  },
+  "devDependencies": {
+    "pkg": "^4.4.3"
   }
 }

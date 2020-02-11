@@ -23,13 +23,19 @@ function init(res)
 {
     clearConsole();
 
-    process.stdin.setRawMode(true);
+    process.stdin.pause();
+
+    global._guessTries = 0;
+
+    if(!debuggerActive)
+        process.stdin.setRawMode(true);
 
     if(!res || res[0] == undefined || res[0].key == "x")
         return process.exit(0);
 
     let difficultyMap = [
         "unused",
+        "easy",
         "normal",
         "hard",
         "about"
@@ -44,17 +50,18 @@ function init(res)
     let randomWord = getRandomWord(availableWords);
     let guessedChars = [];
 
-    renderStage(0, randomWord, guessedChars);
+    return renderStage(0, randomWord, guessedChars);
 }
 
 /**
  * Renders a stage of the hangman game based on the index, the word to guess and the already guessed letters
  * @param {Number} index 
  * @param {RandomWord} wordToGuess 
- * @param {Array<Boolean>} guessedChars 
+ * @param {Array<String>} guessedChars 
  * @param {String} [message]
+ * @param {Boolean} [gameWon]
  */
-function renderStage(index, wordToGuess, guessedChars, message)
+function renderStage(index, wordToGuess, guessedChars, message, winGame)
 {
     clearConsole();
 
@@ -65,24 +72,30 @@ function renderStage(index, wordToGuess, guessedChars, message)
     });
     process.stdout.write(`${graphics.floor}\n\n`);
 
-    process.stdout.write(`Word: ${wordToGuess.word.replace(/[a-zA-Z]/gm, graphics.placeholderChar)}\n`);
+    process.stdout.write(`Word: ${censoredWord(wordToGuess, guessedChars)}\n`);
     process.stdout.write(`Used letters: ${guessedChars.length > 0 ? guessedChars.join(" ") : "(none)"}\n`);
 
     if(!graphics.stages[index + 1])
-        return gameOver();
+        return gameOver(`The word was "${wordToGuess.word}"`);
 
     if(message)
         console.log(`\n${jsl.colors.fg.yellow}${message}${jsl.colors.rst}`);
     else process.stdout.write("\n\n");
 
+    if(winGame === true)
+        return gameWon();
+
     process.stdout.write("\n─► ");
     process.stdin.resume();
 
-    let keypressEvent = chunk => {
+    let keypressEvent = (chunk, key) => {
         if(global._listenerAttached)
         {
             process.stdin.pause();
             removeKeypressEvent();
+
+            if(key.name == "escape")
+                return startMenu();
 
             if(chunk && chunk.match(/\u0003/gmu)) //eslint-disable-line no-control-regex
                 return process.exit(0);
@@ -96,9 +109,21 @@ function renderStage(index, wordToGuess, guessedChars, message)
             if(guessedChars.includes(chunk))
                 return renderStage(index, wordToGuess, guessedChars, "You already tried this letter!");
 
+            global._guessTries++;
+
             guessedChars.push(chunk);
 
-            //#SECTION TODO: logic stuff here
+            let winGame = true;
+            wordToGuess.split.forEach(wc => {
+                if(!guessedChars.includes(wc))
+                    winGame = false;
+            });
+
+            if(winGame)
+                return renderStage(index, wordToGuess, guessedChars, null, true);
+
+            if(wordToGuess.split.includes(chunk))
+                return renderStage(index, wordToGuess, guessedChars);
 
             return renderStage((++index), wordToGuess, guessedChars);
         }
@@ -114,11 +139,58 @@ function renderStage(index, wordToGuess, guessedChars, message)
 }
 
 /**
- * Shows the game over screen
+ * Returns the word from `wordToGuess` with all characters but the ones included in `guessedChars` replaced by the placeholder character
+ * @param {RandomWord} wordToGuess 
+ * @param {Array<String>} guessedChars 
  */
-function gameOver()
+function censoredWord(wordToGuess, guessedChars)
+{
+    if(Array.isArray(guessedChars) && guessedChars.length <= 0)
+        return wordToGuess.word.replace(/[a-zA-Z]/gm, graphics.placeholderChar);
+    else
+    {
+        let wordLetters = removeDuplicates(wordToGuess.split);
+        let replaceLetters = [];
+
+        wordLetters.forEach(letter => {
+            if(!guessedChars.includes(letter))
+                replaceLetters.push(letter);
+        });
+
+        let replaceRegex = new RegExp(`[${replaceLetters.join()}]`, "gm");
+        return wordToGuess.word.replace(replaceRegex, graphics.placeholderChar);
+    }
+}
+
+/**
+ * Removes duplicate items in an array
+ * @param {Array<*>} array 
+ */
+function removeDuplicates(array) {
+    return array.filter((a, b) => array.indexOf(a) === b);
+}
+
+/**
+ * Shows the game over screen
+ * @param {String} [message]
+ */
+function gameOver(message)
 {
     console.log(`\n${jsl.colors.fg.red}Game over!${jsl.colors.rst}\n`);
+    if(message)
+        console.log(`${message}\n`);
+    process.exit(0);
+}
+
+/**
+ * Shows the game won screen
+ * @param {String} [message]
+ */
+function gameWon(message)
+{
+    console.log(`\n${jsl.colors.fg.green}You won the game after ${global._guessTries} guessed letters!${jsl.colors.rst}\n`);
+    if(message)
+        console.log(`${message}\n`);
     process.exit(0);
 }
 
@@ -177,14 +249,18 @@ function startMenu()
         options: [
             {
                 key: "1",
-                description: "Normal"
+                description: "Easy"
             },
             {
                 key: "2",
-                description: "Hard"
+                description: "Normal"
             },
             {
                 key: "3",
+                description: "Hard"
+            },
+            {
+                key: "4",
                 description: "About"
             }
         ]
