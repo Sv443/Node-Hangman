@@ -1,0 +1,19 @@
+---------------------
+
+Node-Hangman by Sv443
+Version 0.1.0
+
+---------------------
+
+
+
+
+[CURRENT: 0.1.0] - First Release of Node-Hangman
+    Features:
+        - Three Difficulties
+        - Fancy GUI
+        - About page
+        - Highscores are saved and can be viewed
+    TODO:
+        - Sort scores on display (by best first, descending)
+        - Delete worst score from difficulty array when array reaches length of 6

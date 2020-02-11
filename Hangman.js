@@ -102,7 +102,7 @@ function renderStage(index, wordToGuess, guessedChars, message, winGame)
     if(winGame === true)
     {
         let score = (global._guessTries - removeDuplicates(wordToGuess.split).length);
-        saveScore(global._gameDifficulty, score);
+        saveScore(global._gameDifficulty, score, wordToGuess.word);
         return gameWon(score);
     }
 
@@ -252,11 +252,21 @@ function gameOver(message)
  */
 function gameWon(score, message)
 {
-    console.log(`\n${jsl.colors.fg.green}You won the game!${jsl.colors.rst}\n\nDifficulty: ${jsl.colors.fg.yellow}${capitalize(global._gameDifficulty)}${jsl.colors.rst}\nYour score is ${score <= 5 ? jsl.colors.fg.green : (score <= 10 ? jsl.colors.fg.yellow : jsl.colors.fg.red)}${score}${jsl.colors.rst}\n`);
+    console.log(`\n${jsl.colors.fg.green}You won the game!${jsl.colors.rst}\n\nDifficulty: ${jsl.colors.fg.yellow}${capitalize(global._gameDifficulty)}${jsl.colors.rst}\nYour score is ${coloredScore(score)}\n`);
     if(message)
         console.log(`${message}\n`);
     
     return pauseThenCall(() => startMenu());
+}
+
+/**
+ * Returns the score with a certain color, depending on the value
+ * @param {Number} score
+ * @returns {String}
+ */
+function coloredScore(score)
+{
+    return `${(score <= 5 ? jsl.colors.fg.green : (score <= 10 ? jsl.colors.fg.yellow : jsl.colors.fg.red))}${score}${jsl.colors.rst}`;
 }
 
 /**
@@ -283,8 +293,22 @@ function showHighscores()
     if(fs.existsSync("./.scores"))
         highscoreObj = JSON.parse(decrypt(fs.readFileSync("./.scores").toString()));
 
-    console.log(`Highscores:\n`);
-    console.log(JSON.stringify(highscoreObj, null, 4));
+    console.log(`${jsl.colors.fg.blue}Highscores:${jsl.colors.rst}\n`);
+    if(highscoreObj == null)
+        console.log("None yet - you have to win a game for a score to be saved");
+    else
+    {
+        Object.keys(highscoreObj).forEach(key => {
+            if(Array.isArray(highscoreObj[key]) && highscoreObj[key].length > 0)
+            {
+                console.log(`\n${jsl.colors.fg.yellow}${capitalize(key)}:${jsl.colors.rst}`);
+                highscoreObj[key].forEach(sc => {
+                    console.log(`    - [${new Date(sc.timestamp).toLocaleString()}] - Score: ${coloredScore(sc.score)} - Word: "${sc.word}"`);
+                });
+            }
+        });
+    }
+    console.log("\n\nLower score = better\n");
     return pauseThenCall(() => startMenu());
 }
 
@@ -292,8 +316,9 @@ function showHighscores()
  * Saves a score to the scoreboard
  * @param {String} difficulty 
  * @param {Number} score 
+ * @param {String} word
  */
-function saveScore(difficulty, score)
+function saveScore(difficulty, score, word)
 {
     let currentScores = {
         "easy": [],
@@ -306,7 +331,8 @@ function saveScore(difficulty, score)
     
     currentScores[difficulty].push({
         timestamp: new Date().getTime(),
-        score: score
+        score: score,
+        word: word
     });
 
     fs.writeFileSync("./.scores", encrypt(JSON.stringify(currentScores, null, 4)));
