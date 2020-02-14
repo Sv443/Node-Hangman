@@ -96,11 +96,13 @@ function renderStage(index, wordToGuess, guessedChars, message, winGame)
     });
     process.stdout.write(`${graphics.floor}\n\n`);
 
-    process.stdout.write(`${translation(global._lang, "game", "word").replace("%1", censoredWord(wordToGuess, guessedChars))}\n`);
+    let needsCapitalization = translation(global._lang, "other", "capitalize_words");
+
+    process.stdout.write(`${translation(global._lang, "game", "word").replace("%1", needsCapitalization ? capitalize(censoredWord(wordToGuess, guessedChars)) : censoredWord(wordToGuess, guessedChars))}\n`);
     process.stdout.write(`${translation(global._lang, "game", "usedletters").replace("%1", guessedChars.length > 0 ? guessedChars.sort().join(" ") : translation(global._lang, "game", "none"))}\n`);
 
     if(!graphics.stages[index + 1])
-        return gameOver(translation(global._lang, "game", "thewordwas").replace("%1", wordToGuess.word));
+        return gameOver(translation(global._lang, "game", "thewordwas").replace("%1", needsCapitalization ? capitalize(wordToGuess.word) : wordToGuess.word));
 
     if(message)
         console.log(`\n${jsl.colors.fg.yellow}${message}${jsl.colors.rst}`);
@@ -128,10 +130,10 @@ function renderStage(index, wordToGuess, guessedChars, message, winGame)
             if(chunk && chunk.match(/\u0003/gmu)) //eslint-disable-line no-control-regex
                 return process.exit(0);
 
-            if(chunk && chunk.match(/[A-Z]/gm))
+            if(chunk && chunk.match(new RegExp(`[${translation(global._lang, "other", "charset_uppercase")}]`, "gm")))
                 chunk = chunk.toLowerCase();
 
-            if(!chunk || !chunk.match(/[a-z]/gm))
+            if(!chunk || !chunk.match(new RegExp(`[${translation(global._lang, "other", "charset_lowercase")}]`, "gm")))
                 return renderStage(index, wordToGuess, guessedChars, translation(global._lang, "game", "invalidchar"));
 
             if(guessedChars.includes(chunk))
@@ -520,6 +522,7 @@ function start()
         if(opts.lang && avlLangs.includes(opts.lang))
         {
             global._lang = opts.lang;
+            let nc = translation(global._lang, "other", "capitalize_words");
             if(!debuggerActive)
             {
                 return startMenu();

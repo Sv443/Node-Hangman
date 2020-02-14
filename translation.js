@@ -17,7 +17,9 @@ const translate = (language, id, subID) => {
 
     if(tr[id] && !subID)
         return tr[id];
-    else if(Object.keys(tr[id]).length > 0 && subID && tr[id][subID])
+    else if(Object.keys(tr[id]).length > 0 && subID && (typeof tr[id][subID] != "boolean" && tr[id][subID]))
+        return tr[id][subID];
+    else if(Object.keys(tr[id]).length > 0 && subID && typeof tr[id][subID] == "boolean")
         return tr[id][subID];
     else
         return `err_no-translation-found @ ${language}:${id}.${subID}`;

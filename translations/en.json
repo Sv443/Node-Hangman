@@ -35,6 +35,9 @@
         "thewordwas": "The word was \"%1\""
     },
     "other": {
-        "exittext": "Goodbye."
+        "exittext": "Goodbye.",
+        "charset_lowercase": "a-z",
+        "charset_uppercase": "A-Z",
+        "capitalize_words": false
     }
 }

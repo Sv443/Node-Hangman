@@ -35,6 +35,9 @@
         "thewordwas": "Das Wort war \"%1\""
     },
     "other": {
-        "exittext": "Spiel beendet."
+        "exittext": "Spiel beendet.",
+        "charset_lowercase": "a-zäöüßẞ",
+        "charset_uppercase": "A-ZÄÖÜßẞ",
+        "capitalize_words": true
     }
 }
