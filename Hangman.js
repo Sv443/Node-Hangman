@@ -275,7 +275,7 @@ function gameWon(score, message)
  */
 function coloredScore(score)
 {
-    return `${(score <= 5 ? jsl.colors.fg.green : (score <= 10 ? jsl.colors.fg.yellow : jsl.colors.fg.red))}${score}${jsl.colors.rst}`;
+    return `${(score <= 4 ? jsl.colors.fg.green : (score <= 8 ? jsl.colors.fg.yellow : jsl.colors.fg.red))}${score}${jsl.colors.rst}`;
 }
 
 /**
@@ -522,7 +522,6 @@ function start()
         if(opts.lang && avlLangs.includes(opts.lang))
         {
             global._lang = opts.lang;
-            let nc = translation(global._lang, "other", "capitalize_words");
             if(!debuggerActive)
             {
                 return startMenu();
