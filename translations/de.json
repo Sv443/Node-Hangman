@@ -1,0 +1,40 @@
+{
+    "info": {
+        "name": "Node-Hangman",
+        "about": "Über Node-Hangman:",
+        "version": "Version:",
+        "madeby": "Gemacht von %1 - %2",
+        "licensedunder": "Lizenziert unter der %1"
+    },
+    "menu": {
+        "title": "Node-Hangman v%1 - Wähle eine Schwierigkeitsstufe:",
+        "easy": "einfach",
+        "normal": "normal",
+        "hard": "schwer",
+        "about": "über",
+        "highscores": "highscores",
+        "changelanguage": "Sprache ändern",
+        "exit": "beenden",
+        "nohighscores": "Noch keine - du musst mindestens ein Spiel gewinnen, damit hier deine Highscores erscheinen",
+        "highscoreline": "Punkte: %1 - Wort: \"%2\" - Sprache: %3 - Datum: %4",
+        "lowerbetter": "(Je weniger Punkte, desto besser)",
+        "emptyselection": "Bitte gib eine der grünen Optionen ein",
+        "invalidoption": "Option \"%1\" ist ungültig!"
+    },
+    "game": {
+        "youwon": "Du hast das Spiel gewonnen!",
+        "difficulty": "Schwierigkeitsstufe:",
+        "yourscore": "Deine Punktzahl ist %1",
+        "gameover": "Spiel verloren!",
+        "presstocontinue": "Drücke eine beliebige Taste, um fortzufahren...",
+        "invalidchar": "Ungültiges Zeichen!",
+        "alreadytried": "Du hast diesen Buchstaben schon versucht!",
+        "none": "(keine)",
+        "usedletters": "Versuchte Buchstaben: %1",
+        "word": "Wort: %1",
+        "thewordwas": "Das Wort war \"%1\""
+    },
+    "other": {
+        "exittext": "Spiel beendet."
+    }
+}

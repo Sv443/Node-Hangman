@@ -13,11 +13,12 @@
         "hard": "hard",
         "about": "about",
         "highscores": "highscores",
+        "changelanguage": "Change Language",
         "exit": "exit",
         "nohighscores": "None yet - you have to win a game for a score to be saved",
-        "highscoreline": "Score: %1 - Word: \"%2\" - Date: %3",
-        "lowerbetter": "Lower score = better",
-        "emptyselection": "Please type one of the green options and press enter",
+        "highscoreline": "Score: %1 - Word: \"%2\" - Language: %3 - Date: %4",
+        "lowerbetter": "(The lower the score, the better)",
+        "emptyselection": "Please type one of the green options",
         "invalidoption": "Invalid option \"%1\" selected"
     },
     "game": {

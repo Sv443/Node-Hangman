@@ -47,24 +47,28 @@ function init(res)
 
     let difficultyMap = [
         "unused",
-        translation(global._lang, "menu", "easy"),
-        translation(global._lang, "menu", "normal"),
-        translation(global._lang, "menu", "hard"),
-        translation(global._lang, "menu", "about"),
-        translation(global._lang, "menu", "highscores")
+        "easy",
+        "normal",
+        "hard",
+        "about",
+        "highscores",
+        "changelanguage"
     ];
 
     let difficulty = difficultyMap[parseInt(res[0].key)];
 
-    if(difficulty == translation(global._lang, "menu", "about"))
+    if(difficulty == "about")
         return aboutGame();
     
-    if(difficulty == translation(global._lang, "menu", "highscores"))
+    if(difficulty == "highscores")
         return showHighscores();
+
+    if(difficulty == "changelanguage")
+        return setLanguage();
     
     global._gameDifficulty = difficulty;
 
-    let words = require(`./data/words-${global._lang}.json`);
+    let words = require(`./translations/words-${global._lang}.json`);
 
     let availableWords = words[difficulty];
     let randomWord = getRandomWord(availableWords);
@@ -292,14 +296,14 @@ function aboutGame()
  */
 function showHighscores()
 {
-    let highscoreObj = {};
+    let highscoreObj = null;
 
     if(fs.existsSync("./.scores"))
         highscoreObj = JSON.parse(decrypt(fs.readFileSync("./.scores").toString()));
 
     console.log(`${jsl.colors.fg.blue}${capitalize(translation(global._lang, "menu", "highscores"))}:${jsl.colors.rst}\n`);
     if(highscoreObj == null)
-        console.log(translation(global._lang, "game", "nohighscores"));
+        console.log(translation(global._lang, "menu", "nohighscores"));
     else
     {
         Object.keys(highscoreObj).forEach(key => {
@@ -307,7 +311,7 @@ function showHighscores()
             {
                 console.log(`\n${jsl.colors.fg.yellow}${capitalize(translation(global._lang, "menu", key))}:${jsl.colors.rst}`);
                 highscoreObj[key].forEach(sc => {
-                    console.log("    " + translation(global._lang, "menu", "highscoreline").replace("%1", `${sc.score < 10 ? " " : ""}${coloredScore(sc.score)}`).replace("%2", sc.word).replace("%3", new Date(sc.timestamp).toLocaleString()));
+                    console.log("    " + translation(global._lang, "menu", "highscoreline").replace("%1", `${sc.score < 10 ? " " : ""}${coloredScore(sc.score)}`).replace("%2", sc.word).replace("%3", sc.lang).replace("%4", new Date(sc.timestamp).toLocaleString()));
                 });
             }
         });
@@ -336,7 +340,8 @@ function saveScore(difficulty, score, word)
     currentScores[difficulty].push({
         timestamp: new Date().getTime(),
         score: score,
-        word: word
+        word: word,
+        lang: global._lang
     });
 
     fs.writeFileSync("./.scores", encrypt(JSON.stringify(currentScores, null, 4)));
@@ -440,6 +445,10 @@ function startMenu()
             {
                 key: "5",
                 description: capitalize(translation(global._lang, "menu", "highscores"))
+            },
+            {
+                key: "6",
+                description: capitalize(translation(global._lang, "menu", "changelanguage"))
             }
         ]
     });
@@ -448,14 +457,84 @@ function startMenu()
 }
 
 
-global._lang = "en"; // TODO: make user be able to set language
-
-if(!debuggerActive)
+function setLanguage()
 {
-    return startMenu();
+    let lmp = new MenuPromptR({
+        autoSubmit: true,
+        retryOnInvalid: true,
+        onFinished: (res) => {
+            let languages = {
+                "1": "en",
+                "2": "de"
+            }
+            let selectedLang = languages[res[0].key];
+
+            if(!fs.existsSync("./.options.json"))
+            {
+                fs.writeFileSync("./.options.json", JSON.stringify({
+                    lang: selectedLang
+                }, null, 4));
+
+                global._lang = selectedLang;
+            }
+            else
+            {
+                let oldOpts = JSON.parse(fs.readFileSync("./.options.json").toString());
+                oldOpts.lang = selectedLang;
+                fs.writeFileSync("./.options.json", JSON.stringify(oldOpts, null, 4));
+
+                global._lang = selectedLang;
+            }
+
+            return startMenu();
+        }
+    });
+
+    lmp.addMenu({
+        title: "Language:",
+        options: [
+            {
+                key: "1",
+                description: "[en] English"
+            },
+            {
+                key: "2",
+                description: "[de] Deutsch / German"
+            }
+        ]
+    });
+
+    lmp.open();
 }
-else return init([
+
+
+function start()
+{
+    if(!fs.existsSync("./.options.json"))
+        return setLanguage();
+    else
     {
-        "key": "2",
+        let opts = JSON.parse(fs.readFileSync("./.options.json").toString());
+        let avlLangs = ["en", "de"];
+
+        if(opts.lang && avlLangs.includes(opts.lang))
+        {
+            global._lang = opts.lang;
+            if(!debuggerActive)
+            {
+                return startMenu();
+            }
+            else return init([
+                {
+                    "key": "2",
+                }
+            ]);
+        }
+        else
+        {
+            global._lang = "en";
+            return setLanguage();
+        }
     }
-]);
+}
+start();
