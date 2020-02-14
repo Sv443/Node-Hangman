@@ -29,8 +29,8 @@ jobs:
         npm run build
       env:
         CI: "true"
-    - name: 'Upload artifact-${{GITHUB_RUN_ID}}'
+    - name: 'Upload artifact'
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: 'Node-Hangman'
+        name: 'Node-Hangman-${{GITHUB_RUN_ID}}'
         path: build/
