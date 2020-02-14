@@ -1,0 +1,39 @@
+{
+    "info": {
+        "name": "Node-Hangman",
+        "about": "About Node-Hangman:",
+        "version": "Version:",
+        "madeby": "Made by %1 - %2",
+        "licensedunder": "Licensed under the %1"
+    },
+    "menu": {
+        "title": "Node-Hangman v%1 - Choose a Difficulty:",
+        "easy": "easy",
+        "normal": "normal",
+        "hard": "hard",
+        "about": "about",
+        "highscores": "highscores",
+        "exit": "exit",
+        "nohighscores": "None yet - you have to win a game for a score to be saved",
+        "highscoreline": "Score: %1 - Word: \"%2\" - Date: %3",
+        "lowerbetter": "Lower score = better",
+        "emptyselection": "Please type one of the green options and press enter",
+        "invalidoption": "Invalid option \"%1\" selected"
+    },
+    "game": {
+        "youwon": "You won the game!",
+        "difficulty": "Difficulty:",
+        "yourscore": "Your score is %1",
+        "gameover": "Game over!",
+        "presstocontinue": "Press any key to continue...",
+        "invalidchar": "Invalid character!",
+        "alreadytried": "You already tried this letter!",
+        "none": "(none)",
+        "usedletters": "Used letters: %1",
+        "word": "Word: %1",
+        "thewordwas": "The word was \"%1\""
+    },
+    "other": {
+        "exittext": "Goodbye."
+    }
+}

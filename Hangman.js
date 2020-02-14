@@ -1,9 +1,10 @@
 const fs = require("fs");
 const crypto = require("crypto");
 const jsl = require("svjsl");
+const MenuPromptR = require("./MenuPromptR");
 const package = require("./package.json");
 const graphics = require("./data/graphics.json");
-const words = require("./data/words.json");
+const translation = require("./translation");
 
 const debuggerActive = (typeof v8debug === "object" || /--debug|--inspect/.test(process.execArgv.join(" ")));
 
@@ -46,22 +47,24 @@ function init(res)
 
     let difficultyMap = [
         "unused",
-        "easy",
-        "normal",
-        "hard",
-        "about",
-        "highscores"
+        translation(global._lang, "menu", "easy"),
+        translation(global._lang, "menu", "normal"),
+        translation(global._lang, "menu", "hard"),
+        translation(global._lang, "menu", "about"),
+        translation(global._lang, "menu", "highscores")
     ];
 
     let difficulty = difficultyMap[parseInt(res[0].key)];
 
-    if(difficulty == "about")
+    if(difficulty == translation(global._lang, "menu", "about"))
         return aboutGame();
     
-    if(difficulty == "highscores")
+    if(difficulty == translation(global._lang, "menu", "highscores"))
         return showHighscores();
     
     global._gameDifficulty = difficulty;
+
+    let words = require(`./data/words-${global._lang}.json`);
 
     let availableWords = words[difficulty];
     let randomWord = getRandomWord(availableWords);
@@ -89,11 +92,11 @@ function renderStage(index, wordToGuess, guessedChars, message, winGame)
     });
     process.stdout.write(`${graphics.floor}\n\n`);
 
-    process.stdout.write(`Word: ${censoredWord(wordToGuess, guessedChars)}\n`);
-    process.stdout.write(`Used letters: ${guessedChars.length > 0 ? guessedChars.sort().join(" ") : "(none)"}\n`);
+    process.stdout.write(`${translation(global._lang, "game", "word").replace("%1", censoredWord(wordToGuess, guessedChars))}\n`);
+    process.stdout.write(`${translation(global._lang, "game", "usedletters").replace("%1", guessedChars.length > 0 ? guessedChars.sort().join(" ") : translation(global._lang, "game", "none"))}\n`);
 
     if(!graphics.stages[index + 1])
-        return gameOver(`The word was "${wordToGuess.word}"`);
+        return gameOver(translation(global._lang, "game", "thewordwas").replace("%1", wordToGuess.word));
 
     if(message)
         console.log(`\n${jsl.colors.fg.yellow}${message}${jsl.colors.rst}`);
@@ -125,10 +128,10 @@ function renderStage(index, wordToGuess, guessedChars, message, winGame)
                 chunk = chunk.toLowerCase();
 
             if(!chunk || !chunk.match(/[a-z]/gm))
-                return renderStage(index, wordToGuess, guessedChars, "Invalid character!");
+                return renderStage(index, wordToGuess, guessedChars, translation(global._lang, "game", "invalidchar"));
 
             if(guessedChars.includes(chunk))
-                return renderStage(index, wordToGuess, guessedChars, "You already tried this letter!");
+                return renderStage(index, wordToGuess, guessedChars, translation(global._lang, "game", "alreadytried"));
 
             global._guessTries++;
 
@@ -189,7 +192,7 @@ function censoredWord(wordToGuess, guessedChars)
  */
 function pauseThenCall(callFunction)
 {
-    process.stdout.write("Press any key to continue... ");
+    process.stdout.write(`${translation(global._lang, "game", "presstocontinue")} `);
     process.stdin.resume();
 
     let keypressEvent = chunk => {
@@ -229,7 +232,7 @@ function removeDuplicates(array) {
  */
 function capitalize(str)
 {
-    return str.substr(0, 1).toUpperCase() + str.substr(1, str.length - 1);
+    return (str.substr(0, 1).toUpperCase() + str.substr(1, str.length - 1));
 }
 
 /**
@@ -238,7 +241,7 @@ function capitalize(str)
  */
 function gameOver(message)
 {
-    console.log(`\n${jsl.colors.fg.red}Game over!${jsl.colors.rst}\n`);
+    console.log(`\n${jsl.colors.fg.red}${translation(global._lang, "game", "gameover")}${jsl.colors.rst}\n`);
     if(message)
         console.log(`${message}\n`);
     
@@ -252,7 +255,7 @@ function gameOver(message)
  */
 function gameWon(score, message)
 {
-    console.log(`\n${jsl.colors.fg.green}You won the game!${jsl.colors.rst}\n\nDifficulty: ${jsl.colors.fg.yellow}${capitalize(global._gameDifficulty)}${jsl.colors.rst}\nYour score is ${coloredScore(score)}\n`);
+    console.log(`\n${jsl.colors.fg.green}${translation(global._lang, "game", "youwon")}${jsl.colors.rst}\n\n${translation(global._lang, "game", "difficulty")} ${jsl.colors.fg.yellow}${capitalize(translation(global._lang, "menu", global._gameDifficulty))}${jsl.colors.rst}\n${translation(global._lang, "game", "yourscore").replace("%1", coloredScore(score))}\n`);
     if(message)
         console.log(`${message}\n`);
     
@@ -274,10 +277,10 @@ function coloredScore(score)
  */
 function aboutGame()
 {
-    console.log(`${jsl.colors.fg.blue}About Node-Hangman:${jsl.colors.rst}\n`);
-    console.log(`Version: ${jsl.colors.fg.yellow}${package.version}${jsl.colors.rst}`);
-    console.log(`Made by ${jsl.colors.fg.yellow}${package.author.name}${jsl.colors.rst} ( ${package.author.url} )`);
-    console.log(`Licensed under the ${jsl.colors.fg.yellow}MIT License${jsl.colors.rst} ( https://sv443.net/LICENSE )`);
+    console.log(`${jsl.colors.fg.blue}${translation(global._lang, "info", "about")}${jsl.colors.rst}\n`);
+    console.log(`${translation(global._lang, "info", "version")} ${jsl.colors.fg.yellow}${package.version}${jsl.colors.rst}`);
+    console.log(`${translation(global._lang, "info", "madeby").replace("%1", `${jsl.colors.fg.yellow}${package.author.name}${jsl.colors.rst}`).replace("%2", package.author.url)}`);
+    console.log(`${translation(global._lang, "info", "licensedunder").replace("%1", `${jsl.colors.fg.yellow}MIT License${jsl.colors.rst}`)} - https://sv443.net/LICENSE`);
 
     process.stdout.write("\n\n");
 
@@ -294,22 +297,22 @@ function showHighscores()
     if(fs.existsSync("./.scores"))
         highscoreObj = JSON.parse(decrypt(fs.readFileSync("./.scores").toString()));
 
-    console.log(`${jsl.colors.fg.blue}Highscores:${jsl.colors.rst}\n`);
+    console.log(`${jsl.colors.fg.blue}${capitalize(translation(global._lang, "menu", "highscores"))}:${jsl.colors.rst}\n`);
     if(highscoreObj == null)
-        console.log("None yet - you have to win a game for a score to be saved");
+        console.log(translation(global._lang, "game", "nohighscores"));
     else
     {
         Object.keys(highscoreObj).forEach(key => {
             if(Array.isArray(highscoreObj[key]) && highscoreObj[key].length > 0)
             {
-                console.log(`\n${jsl.colors.fg.yellow}${capitalize(key)}:${jsl.colors.rst}`);
+                console.log(`\n${jsl.colors.fg.yellow}${capitalize(translation(global._lang, "menu", key))}:${jsl.colors.rst}`);
                 highscoreObj[key].forEach(sc => {
-                    console.log(`    Score: ${sc.score < 10 ? " " : ""}${coloredScore(sc.score)} - Word: "${sc.word}" - Date: ${new Date(sc.timestamp).toLocaleString()}`);
+                    console.log("    " + translation(global._lang, "menu", "highscoreline").replace("%1", `${sc.score < 10 ? " " : ""}${coloredScore(sc.score)}`).replace("%2", sc.word).replace("%3", new Date(sc.timestamp).toLocaleString()));
                 });
             }
         });
     }
-    console.log("\n\nLower score = better\n");
+    console.log(`\n\n${translation(global._lang, "menu", "lowerbetter")}\n`);
     return pauseThenCall(() => startMenu());
 }
 
@@ -372,7 +375,7 @@ function decrypt(value)
 
 function sayGoodbye()
 {
-    console.log(`${jsl.colors.fg.yellow}Goodbye.${jsl.colors.rst}`);
+    console.log(`${jsl.colors.fg.yellow}${translation(global._lang, "other", "exittext")}${jsl.colors.rst}`);
 }
 
 /**
@@ -403,41 +406,49 @@ function startMenu()
 {
     clearConsole();
 
-    let mp = new jsl.MenuPrompt({
+    let mp = new MenuPromptR({
         retryOnInvalid: true,
         autoSubmit: true,
         exitKey: "x",
         onFinished: (res) => init(res)
     });
 
+    mp._exitText = capitalize(translation(global._lang, "menu", "exit"));
+    mp._titleUlChar = "‾";
+    mp._ufEmptySelection = translation(global._lang, "menu", "emptyselection");
+    mp._ufInvalidOption = translation(global._lang, "menu", "invalidoption");
+
     mp.addMenu({
-        title: `Node-Hangman v${package.version} - Choose a Difficulty:`,
+        title: translation(global._lang, "menu", "title").replace("%1", package.version),
         options: [
             {
                 key: "1",
-                description: "Easy"
+                description: capitalize(translation(global._lang, "menu", "easy"))
             },
             {
                 key: "2",
-                description: "Normal"
+                description: capitalize(translation(global._lang, "menu", "normal"))
             },
             {
                 key: "3",
-                description: "Hard\n"
+                description: (capitalize(translation(global._lang, "menu", "hard")) + "\n")
             },
             {
                 key: "4",
-                description: "About"
+                description: capitalize(translation(global._lang, "menu", "about"))
             },
             {
                 key: "5",
-                description: "Highscores"
+                description: capitalize(translation(global._lang, "menu", "highscores"))
             }
         ]
     });
 
     mp.open();
 }
+
+
+global._lang = "en"; // TODO: make user be able to set language
 
 if(!debuggerActive)
 {
