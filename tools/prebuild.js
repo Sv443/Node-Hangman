@@ -2,6 +2,9 @@
 
 const fs = require("fs");
 
+if(!fs.existsSync("./build/"))
+    fs.mkdirSync("./build/");
+
 if(fs.existsSync("./build/translations"))
 {
     fs.rmdirSync("./build/translations", {

@@ -3,7 +3,7 @@ name: build
 on: [push] # runs on every push
 
 jobs:
-  build-win:
+  build:
     runs-on: windows-latest
 
     timeout-minutes: 10
