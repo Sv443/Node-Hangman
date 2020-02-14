@@ -3,9 +3,11 @@
 const fs = require("fs");
 
 if(fs.existsSync("./build/translations"))
+{
     fs.rmdirSync("./build/translations", {
         recursive: true
     });
+}
 
 fs.readdirSync("./build").forEach(f => {
     fs.unlinkSync(`./build/${f}`);

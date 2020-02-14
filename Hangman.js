@@ -537,4 +537,8 @@ function start()
         }
     }
 }
+
+console.log(fs.existsSync("./de.json"))
+console.log(fs.existsSync("./translations/de.json"))
+
 start();

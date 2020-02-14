@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node Hangman.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-win": "pkg -t node12-win -o build/Node-Hangman_win.exe Hangman.js",
-    "build-linux": "pkg -t node12-linux -o build/Node-Hangman_linux Hangman.js",
+    "build-win": "pkg -t node12-win -o build/Node-Hangman_win.exe .",
+    "build-linux": "pkg -t node12-linux -o build/Node-Hangman_linux .",
     "build": "node tools/prebuild.js && npm run build-win && npm run build-linux && node tools/postbuild.js"
   },
   "repository": {
@@ -39,5 +39,11 @@
   },
   "devDependencies": {
     "pkg": "^4.4.3"
+  },
+  "bin": "Hangman.js",
+  "pkg": {
+    "assets": [
+      "translations/*"
+    ]
   }
 }
