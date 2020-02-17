@@ -15,6 +15,7 @@ node_modules/
 *.tgz
 .yarn-integrity
 .env
+
 dist
 build/*
 .scores

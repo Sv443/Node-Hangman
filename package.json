@@ -6,9 +6,10 @@
   "scripts": {
     "start": "node Hangman.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-win": "pkg -t node12-win -o build/Node-Hangman_win.exe .",
-    "build-linux": "pkg -t node12-linux -o build/Node-Hangman_linux .",
-    "build": "node tools/prebuild.js && npm run build-win && npm run build-linux && node tools/postbuild.js"
+    "build-win": "pkg -t node12-win-x64 -o build/Node-Hangman_Windows.exe .",
+    "build-linux": "pkg -t node12-linux-x64 -o build/Node-Hangman_Linux .",
+    "build-macos": "pkg -t node12-macos-x64 -o build/Node-Hangman_MacOS.dmg .",
+    "build": "node tools/prebuild.js && npm run build-win && npm run build-linux && npm run build-macos && node tools/postbuild.js"
   },
   "repository": {
     "type": "git",
