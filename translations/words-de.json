@@ -1,11 +1,49 @@
 {
     "easy": [
-        "test"
+        "umweltschutzorganisation",
+        "nahrungsmittel",
+        "liebesabenteuer",
+        "fussballweltmeisterschaft",
+        "haftpflichtversicherung",
+        "Sonnenuntergang",
+        "eintrittskarte",
+        "taschenmesser",
+        "toilettenpapier",
+        "alkoholvergiftung"
     ],
     "normal": [
-        "test"
+        "umweltschutzorganisation",
+        "nahrungsmittel",
+        "liebesabenteuer",
+        "fussballweltmeisterschaft",
+        "haftpflichtversicherung",
+        "sonnenuntergang",
+        "eintrittskarte",
+        "taschenmesser",
+        "toilettenpapier",
+        "alkoholvergiftung"
     ],
     "hard": [
-        "test"
+        "desoxyribonukleinsäure",
+        "kuddelmuddel",
+        "dachpappe",
+        "babypuppe",
+        "kopfkino",
+        "zwilling",
+        "zwieback",
+        "kruzifix",
+        "kopfball",
+        "zyankali",
+        "juwelen",
+        "sex",
+        "hund",
+        "oper",
+        "mond",
+        "yeti",
+        "mars",
+        "auto",
+        "zebra",
+        "katze",
+        "venus"
     ]
 }

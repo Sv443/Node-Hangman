@@ -19,7 +19,8 @@
         "highscoreline": "Punkte: %1 - Wort: \"%2\" - Sprache: %3 - Datum: %4",
         "lowerbetter": "(Je weniger Punkte, desto besser)",
         "emptyselection": "Bitte gib eine der grünen Optionen ein",
-        "invalidoption": "Option \"%1\" ist ungültig!"
+        "invalidoption": "Option \"%1\" ist ungültig!",
+        "decryptionerror": "Die Höchstpunktzahl-Datei scheint beschädigt zu sein oder kommt von einem anderen Gerät und kann daher nicht entschlüsselt werden.\nBitte gewinne das Spiel ein Mal, um die alte Datei zu überschreiben."
     },
     "game": {
         "youwon": "Du hast das Spiel gewonnen!",

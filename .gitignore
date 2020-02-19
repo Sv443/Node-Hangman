@@ -20,3 +20,4 @@ dist
 build/*
 .scores.dat
 .options.json
+test.js

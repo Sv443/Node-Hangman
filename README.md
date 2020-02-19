@@ -30,6 +30,7 @@ To build Node-Hangman from source, follow these steps:
 ## Dependencies:
 - [svjsl](https://npmjs.com/package/svjsl)
 - [hidefile](https://npmjs.com/package/hidefile)
+- [node-machine-id](https://npmjs.com/package/node-machine-id)
 - [pkg](https://npmjs.com/package/pkg)
 - [eslint](https://npmjs.com/package/eslint)
 

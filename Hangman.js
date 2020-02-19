@@ -2,13 +2,13 @@ const fs = require("fs");
 const crypto = require("crypto");
 const jsl = require("svjsl");
 const hidefile = require("hidefile");
+const machineId = require("node-machine-id");
 const MenuPromptR = require("./MenuPromptR");
 const package = require("./package.json");
 const graphics = require("./data/graphics.json");
 const translation = require("./translation");
 
 const debuggerActive = (typeof v8debug === "object" || /--debug|--inspect/.test(process.execArgv.join(" ")));
-
 
 /**
  * @typedef {Object} MenuPromptResult The results of the menu prompt
@@ -302,7 +302,16 @@ function showHighscores()
     let highscoreObj = null;
 
     if(fs.existsSync("./.scores.dat"))
-        highscoreObj = JSON.parse(decrypt(fs.readFileSync("./.scores.dat").toString()));
+    {
+        hidefile.revealSync("./.scores.dat");
+        let decrypted = decrypt(fs.readFileSync("./scores.dat").toString());
+        if(decrypted == null)
+            console.log(`\n${jsl.colors.fg.red}${translation(global._lang, "menu", "decryptionerror")}${jsl.colors.rst}\n`);
+
+        highscoreObj = JSON.parse(decrypted);
+
+        hidefile.hideSync("./scores.dat");
+    }
 
     console.log(`${jsl.colors.fg.blue}${capitalize(translation(global._lang, "menu", "highscores"))}:${jsl.colors.rst}\n`);
     if(highscoreObj == null)
@@ -313,7 +322,14 @@ function showHighscores()
             if(Array.isArray(highscoreObj[key]) && highscoreObj[key].length > 0)
             {
                 console.log(`\n${jsl.colors.fg.yellow}${capitalize(translation(global._lang, "menu", key))}:${jsl.colors.rst}`);
-                highscoreObj[key].forEach(sc => {
+
+                let sortedScores = highscoreObj[key].sort((a, b) => (a.score < b.score ? -1 : 1));
+
+                let scl = sortedScores.length;
+                if(scl > 5)
+                    sortedScores.splice(5, scl - 5);
+
+                sortedScores.forEach(sc => {
                     console.log("    " + translation(global._lang, "menu", "highscoreline").replace("%1", `${sc.score < 10 ? " " : ""}${coloredScore(sc.score)}`).replace("%2", sc.word).replace("%3", sc.lang).replace("%4", new Date(sc.timestamp).toLocaleString()));
                 });
             }
@@ -341,49 +357,79 @@ function saveScore(difficulty, score, word)
         hidefile.revealSync("./.scores.dat");
 
     if(fs.existsSync("./scores.dat"))
-        currentScores = JSON.parse(decrypt(fs.readFileSync("./scores.dat").toString()));
+    {
+        let decrypted;
+        try
+        {
+            decrypted = decrypt(fs.readFileSync("./scores.dat").toString());
+            if(decrypted == null)
+                fs.unlinkSync("./scores.dat");
+            else
+                currentScores = JSON.parse(decrypted);
+        }
+        catch(err)
+        {
+            jsl.unused(err);
+        }
+    }
     
     currentScores[difficulty].push({
         timestamp: new Date().getTime(),
         score: score,
-        word: word,
+        word: translation(global._lang, "other", "capitalize_words") === true ? capitalize(word) : word,
         lang: global._lang
     });
-
-    
-
 
     fs.writeFileSync("./scores.dat", encrypt(JSON.stringify(currentScores, null, 4)));
     hidefile.hideSync("./scores.dat");
 }
 
 /**
- * Encrypts things like the score object so users can't easily tamper with them. Obviously this isn't very safe but if you know what you're doing I won't be able to stop you anyways
+ * Encrypts things like the score object so users can't easily tamper with them
  * @param {String} value 
  * @returns {Buffer}
  */
 function encrypt(value)
 {
+    // obviously this isn't very secure but if you know what you're doing I won't be able to stop you anyways - this is just to deter the "normal people"
+    let key = crypto.createHash("md5").update(machineId.machineIdSync()).digest("hex");
+
     let iv = crypto.randomBytes(16);
-    let cipher = crypto.createCipheriv("aes-256-cbc", "aa5de862e31081dcb5605ffdfad9d82a", iv);
+    let cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
     let encrypted = cipher.update(value.toString());
-    return `${iv.toString("latin1")}:${Buffer.concat([encrypted, cipher.final()]).toString("latin1")}`;
+    return `${iv.toString("hex")}:${Buffer.concat([encrypted, cipher.final()]).toString("binary")}`;
 }
 
 /**
  * Decrypts previously encrypted things like the score object
  * @param {String} value 
- * @returns {String}
+ * @returns {String|null}
  */
 function decrypt(value)
 {
+    let key = crypto.createHash("md5").update(machineId.machineIdSync()).digest("hex");
+
     let textParts = value.split(":");
-    let iv = Buffer.from(textParts.shift(), "latin1");
-    let encryptedText = Buffer.from(textParts.join(":"), "latin1");
-    let decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from("aa5de862e31081dcb5605ffdfad9d82a"), iv);
+    let iv = Buffer.from(textParts.shift(), "hex");
+    let encryptedText = Buffer.from(textParts.join(":"), "binary");
+    let decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(key), iv);
     let decrypted = decipher.update(encryptedText);
 
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    let finalDecipher = null;
+    try
+    {
+        finalDecipher = decipher.final();
+    }
+    catch(err)
+    {
+        jsl.unused(err);
+        return null;
+    }
+
+    if(finalDecipher == null)
+        return null;
+
+    decrypted = Buffer.concat([decrypted, finalDecipher]);
 
     return decrypted.toString();
 }
@@ -510,11 +556,11 @@ function setLanguage()
         options: [
             {
                 key: "1",
-                description: "[en] English"
+                description: "English"
             },
             {
                 key: "2",
-                description: "[de] Deutsch / German"
+                description: "Deutsch / German"
             }
         ]
     });

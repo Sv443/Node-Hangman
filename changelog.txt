@@ -14,7 +14,7 @@ Version 0.1.0
         - Fancy GUI
         - About page
         - Highscores are saved and can be viewed
-        - Capability for translations
+        - Two languages; English and German
     TODO:
         - Sort scores on display (by best first, descending)
         - Delete worst score from difficulty array when array reaches length of 6

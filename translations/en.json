@@ -19,7 +19,8 @@
         "highscoreline": "Score: %1 - Word: \"%2\" - Language: %3 - Date: %4",
         "lowerbetter": "(The lower the score, the better)",
         "emptyselection": "Please type one of the green options",
-        "invalidoption": "Invalid option \"%1\" selected"
+        "invalidoption": "Invalid option \"%1\" selected",
+        "decryptionerror": "The highscores file seems to be corrupted or originates from a different device and cannot be decrypted.\nPlease win the game once to overwrite the old file."
     },
     "game": {
         "youwon": "You won the game!",
