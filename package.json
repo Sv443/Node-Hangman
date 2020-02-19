@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node Hangman.js",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ./ && exit $?",
     "build-win": "pkg -t node12-win-x64 -o build/Node-Hangman_Windows.exe .",
     "build-linux": "pkg -t node12-linux-x64 -o build/Node-Hangman_Linux .",
     "build-macos": "pkg -t node12-macos-x64 -o build/Node-Hangman_MacOS.dmg .",
@@ -32,13 +33,16 @@
   },
   "license": "MIT",
   "bugs": {
+    "email": "sven.fehler@web.de",
     "url": "https://github.com/Sv443/Node-Hangman/issues"
   },
   "homepage": "https://github.com/Sv443/Node-Hangman#readme",
   "dependencies": {
+    "hidefile": "^3.0.0",
     "svjsl": "^1.8.3"
   },
   "devDependencies": {
+    "eslint": "^6.8.0",
     "pkg": "^4.4.3"
   },
   "bin": "Hangman.js",

@@ -14,18 +14,24 @@ Languages: 🇪🇳 English, 🇩🇪 German
 
 <br>
 
-To delete all highscores, turn on ["show hidden files and folders"](https://www.howtogeek.com/howto/windows-vista/show-hidden-files-and-folders-in-windows-vista/) in Windows Explorer and delete the `.scores` file.
+To delete all highscores, turn on ["show hidden files and folders"](https://www.howtogeek.com/howto/windows-vista/show-hidden-files-and-folders-in-windows-vista/) in Windows Explorer and delete the `.scores.dat` file.
 
 <br><br>
 
 ## Build instructions:
 To build Node-Hangman from source, follow these steps:
-1. Make sure at least a semi-recent version of Node.js is installed on your system
+1. Make sure at least a semi-recent version of [Node.js](https://nodejs.org/) (I recommend v12 or higher) is installed on your system
 2. Run the commands `npm i` and `npm i --save-dev` to install all the dependencies
-3. Build the executable file:
-    - To build a .exe for Windows, run the command `npm run build-win`
-    - To build an executable file for Linux, run the command `npm run build-linux`
-    - To build both, run the command `npm run build`
+3. Install the npm package [`pkg`](https://npmjs.com/package/pkg) with the command `npm i -g pkg`
+4. Build the executable file by running the command `npm run build`
+
+<br>
+
+## Dependencies:
+- [svjsl](https://npmjs.com/package/svjsl)
+- [hidefile](https://npmjs.com/package/hidefile)
+- [pkg](https://npmjs.com/package/pkg)
+- [eslint](https://npmjs.com/package/eslint)
 
 <br><br>
 

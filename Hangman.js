@@ -1,6 +1,7 @@
 const fs = require("fs");
 const crypto = require("crypto");
 const jsl = require("svjsl");
+const hidefile = require("hidefile");
 const MenuPromptR = require("./MenuPromptR");
 const package = require("./package.json");
 const graphics = require("./data/graphics.json");
@@ -300,8 +301,8 @@ function showHighscores()
 {
     let highscoreObj = null;
 
-    if(fs.existsSync("./.scores"))
-        highscoreObj = JSON.parse(decrypt(fs.readFileSync("./.scores").toString()));
+    if(fs.existsSync("./.scores.dat"))
+        highscoreObj = JSON.parse(decrypt(fs.readFileSync("./.scores.dat").toString()));
 
     console.log(`${jsl.colors.fg.blue}${capitalize(translation(global._lang, "menu", "highscores"))}:${jsl.colors.rst}\n`);
     if(highscoreObj == null)
@@ -336,8 +337,11 @@ function saveScore(difficulty, score, word)
         "hard": []
     };
     
-    if(fs.existsSync("./.scores"))
-        currentScores = JSON.parse(decrypt(fs.readFileSync("./.scores").toString()));
+    if(fs.existsSync("./.scores.dat"))
+        hidefile.revealSync("./.scores.dat");
+
+    if(fs.existsSync("./scores.dat"))
+        currentScores = JSON.parse(decrypt(fs.readFileSync("./scores.dat").toString()));
     
     currentScores[difficulty].push({
         timestamp: new Date().getTime(),
@@ -346,7 +350,11 @@ function saveScore(difficulty, score, word)
         lang: global._lang
     });
 
-    fs.writeFileSync("./.scores", encrypt(JSON.stringify(currentScores, null, 4)));
+    
+
+
+    fs.writeFileSync("./scores.dat", encrypt(JSON.stringify(currentScores, null, 4)));
+    hidefile.hideSync("./scores.dat");
 }
 
 /**
@@ -359,7 +367,7 @@ function encrypt(value)
     let iv = crypto.randomBytes(16);
     let cipher = crypto.createCipheriv("aes-256-cbc", "aa5de862e31081dcb5605ffdfad9d82a", iv);
     let encrypted = cipher.update(value.toString());
-    return `${iv.toString("hex")}:${Buffer.concat([encrypted, cipher.final()]).toString("hex")}`;
+    return `${iv.toString("latin1")}:${Buffer.concat([encrypted, cipher.final()]).toString("latin1")}`;
 }
 
 /**
@@ -370,8 +378,8 @@ function encrypt(value)
 function decrypt(value)
 {
     let textParts = value.split(":");
-    let iv = Buffer.from(textParts.shift(), "hex");
-    let encryptedText = Buffer.from(textParts.join(":"), "hex");
+    let iv = Buffer.from(textParts.shift(), "latin1");
+    let encryptedText = Buffer.from(textParts.join(":"), "latin1");
     let decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from("aa5de862e31081dcb5605ffdfad9d82a"), iv);
     let decrypted = decipher.update(encryptedText);
 
@@ -471,9 +479,12 @@ function setLanguage()
             }
             let selectedLang = languages[res[0].key];
 
-            if(!fs.existsSync("./.options.json"))
+            if(fs.existsSync("./.options.json"))
+                hidefile.revealSync("./.options.json");
+
+            if(!fs.existsSync("./options.json"))
             {
-                fs.writeFileSync("./.options.json", JSON.stringify({
+                fs.writeFileSync("./options.json", JSON.stringify({
                     lang: selectedLang
                 }, null, 4));
 
@@ -481,12 +492,14 @@ function setLanguage()
             }
             else
             {
-                let oldOpts = JSON.parse(fs.readFileSync("./.options.json").toString());
+                let oldOpts = JSON.parse(fs.readFileSync("./options.json").toString());
                 oldOpts.lang = selectedLang;
-                fs.writeFileSync("./.options.json", JSON.stringify(oldOpts, null, 4));
+                fs.writeFileSync("./options.json", JSON.stringify(oldOpts, null, 4));
 
                 global._lang = selectedLang;
             }
+
+            hidefile.hideSync("./options.json");
 
             return startMenu();
         }
@@ -539,8 +552,5 @@ function start()
         }
     }
 }
-
-console.log(fs.existsSync("./de.json"))
-console.log(fs.existsSync("./translations/de.json"))
 
 start();
