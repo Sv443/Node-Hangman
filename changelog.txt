@@ -15,6 +15,5 @@ Version 0.1.0
         - About page
         - Highscores are saved and can be viewed
         - Two languages; English and German
-    TODO:
         - Sort scores on display (by best first, descending)
         - Delete worst score from difficulty array when array reaches length of 6
