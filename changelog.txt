@@ -10,10 +10,8 @@ Version 0.1.0
 
 [CURRENT: 0.1.0] - First Release of Node-Hangman
     Features:
-        - Three Difficulties
-        - Fancy GUI
-        - About page
-        - Highscores are saved and can be viewed
+        - Three Difficulties; Easy, Normal and Hard
+        - A fancy GUI (as fancy as you can get with only the command line)
+        - An about page with some info on Node-Hangman
+        - Highscores are saved encrypted and can be viewed only through the Game
         - Two languages; English and German
-        - Sort scores on display (by best first, descending)
-        - Delete worst score from difficulty array when array reaches length of 6
