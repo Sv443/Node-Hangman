@@ -40,7 +40,6 @@ To build Node-Hangman from source, follow these steps:
 
 
 Made with ❤️ by [Sv443](https://github.com/Sv443)  
-
 Support me on [Patreon](https://patreon.com/Sv443_), [Ko-fi](https://ko-fi.com/Sv443_) or [PayPal](https://paypal.me/SvenFehler)
 
 
