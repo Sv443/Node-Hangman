@@ -6,7 +6,7 @@
 
 A simple game of hangman you can play directly in the Command Line Interface.  
 Features three difficulties (easy, medium and hard), an easy to use interface and a highscore tracker.  
-Languages: 🇪🇳 English, 🇩🇪 German
+Languages: 🇬🇧 English, 🇩🇪 German
 
 <br>
 
