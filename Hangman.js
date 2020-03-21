@@ -111,7 +111,7 @@ function renderStage(index, wordToGuess, guessedChars, message, winGame)
 
     if(winGame === true)
     {
-        let score = (global._guessTries - removeDuplicates(wordToGuess.split).length);
+        let score = graphics.stages.length - (global._guessTries - removeDuplicates(wordToGuess.split).length);
         saveScore(global._gameDifficulty, score, wordToGuess.word);
         return gameWon(score);
     }
@@ -276,7 +276,7 @@ function gameWon(score, message)
  */
 function coloredScore(score)
 {
-    return `${(score <= 4 ? jsl.colors.fg.green : (score <= 8 ? jsl.colors.fg.yellow : jsl.colors.fg.red))}${score}${jsl.colors.rst}`;
+    return `${(score <= 3 ? jsl.colors.fg.red : (score <= 7 ? jsl.colors.fg.yellow : jsl.colors.fg.green))}${score}${jsl.colors.rst}`;
 }
 
 /**
@@ -323,7 +323,7 @@ function showHighscores()
             {
                 console.log(`\n${jsl.colors.fg.yellow}${capitalize(translation(global._lang, "menu", key))}:${jsl.colors.rst}`);
 
-                let sortedScores = highscoreObj[key].sort((a, b) => (a.score < b.score ? -1 : 1));
+                let sortedScores = highscoreObj[key].sort((a, b) => (a.score > b.score ? -1 : 1));
 
                 let scl = sortedScores.length;
                 if(scl > 5)
@@ -335,7 +335,7 @@ function showHighscores()
             }
         });
     }
-    console.log(`\n\n${translation(global._lang, "menu", "lowerbetter")}\n`);
+    console.log(`\n\n${translation(global._lang, "menu", "lowerbetter").replace("%1", graphics.stages.length)}\n`);
     return pauseThenCall(() => startMenu());
 }
 

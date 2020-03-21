@@ -1,6 +1,6 @@
 {
   "name": "node-hangman",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A simple game of hangman you can play directly in the CLI",
   "main": "Hangman.js",
   "scripts": {
@@ -40,7 +40,7 @@
   "dependencies": {
     "hidefile": "^3.0.0",
     "node-machine-id": "^1.1.12",
-    "svjsl": "^1.8.3"
+    "svjsl": "^1.9.1"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
