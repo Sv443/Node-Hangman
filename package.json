@@ -10,7 +10,9 @@
     "build-win": "pkg -t node12-win-x64 -o build/Node-Hangman_Windows.exe .",
     "build-linux": "pkg -t node12-linux-x64 -o build/Node-Hangman_Linux .",
     "build-macos": "pkg -t node12-macos-x64 -o build/Node-Hangman_MacOS.dmg .",
-    "build": "node tools/prebuild.js && npm run build-win && npm run build-linux && npm run build-macos && node tools/postbuild.js"
+    "build": "node tools/prebuild.js && npm run build-win && npm run build-linux && npm run build-macos && node tools/postbuild.js",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -40,7 +42,8 @@
   "dependencies": {
     "hidefile": "^3.0.0",
     "node-machine-id": "^1.1.12",
-    "svjsl": "^1.8.3"
+    "svjsl": "^1.8.3",
+    "snyk": "^1.316.1"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
@@ -51,5 +54,6 @@
     "assets": [
       "translations/*"
     ]
-  }
+  },
+  "snyk": true
 }
