@@ -1,6 +1,6 @@
 # Node-Hangman
 [![License](https://img.shields.io/github/license/Sv443/Node-Hangman)](https://sv443.net/LICENSE)
-[![Build Status](https://github.com/Sv443/Node-Hangman/workflows/build/badge.svg)](https://github.com/Sv443/JokeAPI/actions)
+[![Build Status](https://github.com/Sv443/Node-Hangman/workflows/build/badge.svg)](https://github.com/Sv443/Node-Hangman/actions)
 [![Known Vulnerabilities](https://snyk.io/test/github/Sv443/Node-Hangman/badge.svg)](https://snyk.io/test/github/Sv443/Node-Hangman)
 [![Discord](https://img.shields.io/discord/565933531214118942)](https://sv443.net/discord)  
 
