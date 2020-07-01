@@ -9,7 +9,7 @@
     "lint": "eslint ./ && exit $?",
     "build-win": "pkg -t node12-win-x64 -o build/Node-Hangman_Windows.exe .",
     "build-linux": "pkg -t node12-linux-x64 -o build/Node-Hangman_Linux .",
-    "build-macos": "pkg -t node12-macos-x64 -o build/Node-Hangman_MacOS.dmg .",
+    "build-macos": "pkg -t node12-macos-x64 -o build/Node-Hangman_MacOS .",
     "build": "node tools/prebuild.js && npm run build-win && npm run build-linux && npm run build-macos && node tools/postbuild.js",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect"
