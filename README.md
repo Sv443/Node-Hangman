@@ -22,8 +22,8 @@ To delete all highscores, turn on ["show hidden files and folders"](https://www.
 To build Node-Hangman from source, follow these steps:
 1. Make sure at least a semi-recent version of [Node.js](https://nodejs.org/) (I recommend v12 or higher) is installed on your system
 2. Run the command `npm i` to install all the dependencies
-<!--3. Install the npm package [`pkg`](https://npmjs.com/package/pkg) with the command `npm i -g pkg`-->
 3. Build the executable file by running the command `npm run build`
+<!--3. Install the npm package [`pkg`](https://npmjs.com/package/pkg) with the command `npm i -g pkg`-->
 
 (If `pkg` couldn't be found, use `npm i -g pkg` to install it)
 
